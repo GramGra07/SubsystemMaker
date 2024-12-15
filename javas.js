@@ -165,72 +165,45 @@ function toRun() {
 function generateData() {
     let inputString = document.getElementById('inputString').value;
     const selector = document.getElementById('selector').value;
-    const list = document.getElementById('inputList').value;
-    inputString += 'State';
-    
-    // Error handling
-    let enumData = list.split(',').map(item => item.trim().toUpperCase());
-    const uniqueEnumData = [...new Set(enumData)];
-    if (enumData.length !== uniqueEnumData.length) {
-        alert('Error: The list contains duplicate enums.');
-        return;
-    }
-    if (inputString === 'State') {
-        alert('Error: The mechanism name cannot be empty.');
-        return;
-    }
-    if (list === '') {
-        alert('Error: The list cannot be empty.');
-        return;
-    }
-    if (selector !== 'Java' && selector !== 'Kotlin') {
-        alert('Error: The selector must be either "Java" or "Kotlin".');
-        return;
-    }
-    
-    uniqueEnumData.push('IDLE'); // Correctly add 'IDLE' to the enumData array
+    const servoElement = document.getElementById('servoList').value;
+    const servoList = servoElement.split(',').map((item) => item.trim());
+    const name = inputString+="Subsystem"
     
     let generatedData = ''; // Initialize generatedData as an empty string
 
     if (selector === 'Java') {
-        generatedData = `public enum ${inputString} {${uniqueEnumData.join(', ')}}\n\n`;
-        generatedData += `private ${inputString} ${inputString}Var = ${inputString}.IDLE;\n\n`;
-        
-        let setters = ''; // Initialize setters as an empty string
-        for (let i = 0; i < uniqueEnumData.length; i++) {
-            setters += `public void set${uniqueEnumData[i]}() {\n    ${inputString}Var = ${inputString}.${uniqueEnumData[i]};\n}\n\n`;
+        generatedData += "import com.qualcomm.robotcore.hardware.Servo;\nimport org.firstinspires.ftc.robotcore.external.Telemetry;";
+        generatedData += "public class " + name + " {\n";
+        for (let i = 0; i < servoList.length; i++) {
+            generatedData += "    private Servo " + servoList[i] + "Servo;\n";
         }
-        generatedData += setters;
-
-        let switchStatements = ''; // Initialize switchStatements as an empty string
-        switchStatements += `switch (${inputString}Var) {\n`;
-        for (let i = 0; i < uniqueEnumData.length; i++) {
-            switchStatements += `    case ${uniqueEnumData[i]}:\n        // Add code here\n        break;\n`;
+        generatedData += "\n";
+        generatedData += "    public " + name + "(HardwareMap hwMap) {\n";
+        for (let i = 0; i < servoList.length; i++) {
+            generatedData += "        " + servoList[i] + "Servo = hwMap.get(Servo.class, \"" + servoList[i] + "Servo\");\n";
         }
-        switchStatements += '}\n';
-        generatedData += switchStatements;
-
-        document.getElementById('outputText').className = 'java-format';
-
+        generatedData += "    }\n";
+        generatedData += "\n";
+        generatedData += "    public void update() {\n";
+        generatedData += "        // this is where you put your state machines and all power functions (call this in our main code)\n";
+        generatedData += "    }\n";
+        generatedData += "\n";
+        generatedData += "    public void telemetry(Telemetry telemetry) {\n";
+        generatedData += "        // add telemetry data here\n";
+        generatedData += "    }\n";
+        generatedData += "}\n";
     } else if (selector === 'Kotlin') {
-        generatedData = `enum class ${inputString} {${uniqueEnumData.join(', ')}}\n\n`;
-        generatedData += `private var ${inputString}Var: ${inputString} = ${inputString}.IDLE\n\n`;
-        
-        let setters = ''; // Initialize setters as an empty string
-        for (let i = 0; i < uniqueEnumData.length; i++) {
-            setters += `fun set${uniqueEnumData[i]}() {\n    ${inputString}Var = ${inputString}.${uniqueEnumData[i]}\n}\n\n`;
+        generatedData+="class "+name+"(ahwMap:HardwareMap) {\n"
+        for (let i = 0; i < servoList.length; i++) {
+            generatedData += "    private var " + servoList[i] + "Servo\n";
         }
-        generatedData += setters;
-
-        let whenStatements = ''; // Initialize whenStatements as an empty string
-        whenStatements += `when (${inputString}Var) {\n`;
-        for (let i = 0; i < uniqueEnumData.length; i++) {
-            whenStatements += `    ${inputString}.${uniqueEnumData[i]} -> {\n        // Add code here\n    }\n`;
+        generatedData += "\n"
+        generatedData += "    init {\n"
+        for (let i = 0; i < servoList.length; i++) {
+            generatedData += "        " + servoList[i] + "Servo = ahwMap.get(Servo::class.java, \"" + servoList[i] + "Servo\")\n";
         }
-        whenStatements += '}\n';
-        generatedData += whenStatements;
-
-        document.getElementById('outputText').className = 'kotlin-format';
+        generatedData += "}\n"
+        generatedData += "fun update() {\n// this is where you put your state machines and all power functions (call this in our main code)\n}\nfun telemetry(telemetry:Telemetry){\n\n}\n}"
     }
     
     console.log('Generated Data:', generatedData);
