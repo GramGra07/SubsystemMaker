@@ -177,7 +177,7 @@ function generateData() {
         for (let i = 0; i < servoList.length; i++) {
             generatedData += "    private Servo " + servoList[i] + "Servo;\n";
         }
-        generatedData += "\n";
+        generatedData += "\n//this is where you put all enums and variables\n";
         generatedData += "    public " + name + "(HardwareMap hwMap) {\n";
         for (let i = 0; i < servoList.length; i++) {
             generatedData += "        " + servoList[i] + "Servo = hwMap.get(Servo.class, \"" + servoList[i] + "Servo\");\n";
@@ -187,13 +187,13 @@ function generateData() {
         generatedData += "    public void update() {\n";
         generatedData += "        // this is where you put your state machines and all power functions (call this in our main code)\n";
         generatedData += "    }\n";
-        generatedData += "\n";
+        generatedData += "\n    // this is where you put your update functions to switch between states\n";
         generatedData += "    public void telemetry(Telemetry telemetry) {\n";
         generatedData += "        // add telemetry data here\n";
         generatedData += "    }\n";
         generatedData += "}\n";
     } else if (selector === 'Kotlin') {
-        generatedData+="class "+name+"(ahwMap:HardwareMap) {\n"
+        generatedData+="class "+name+"(ahwMap:HardwareMap) {\n//this is where you put all enums and variables\n"
         for (let i = 0; i < servoList.length; i++) {
             generatedData += "    private var " + servoList[i] + "Servo\n";
         }
@@ -202,7 +202,7 @@ function generateData() {
         for (let i = 0; i < servoList.length; i++) {
             generatedData += "        " + servoList[i] + "Servo = ahwMap.get(Servo::class.java, \"" + servoList[i] + "Servo\")\n";
         }
-        generatedData += "}\n"
+        generatedData += "}\n//this is where you put functions to switch states\n"
         generatedData += "fun update() {\n// this is where you put your state machines and all power functions (call this in our main code)\n}\nfun telemetry(telemetry:Telemetry){\n\n}\n}"
     }
     
